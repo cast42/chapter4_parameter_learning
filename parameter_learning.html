@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta name="generator" content="quarto-0.3.114">
+  <title>Chapter 4: Parameter learning</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="parameter_learning_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="parameter_learning_files/libs/revealjs/dist/reveal.css">
+  <style>
+    .reveal .sourceCode {  /* see #7635 */
+      overflow: visible;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="parameter_learning_files/libs/revealjs/dist/theme/quarto.css" id="theme">
+
+  <script src="parameter_learning_files/libs/clipboard/clipboard.min.js"></script>
+  <script src="parameter_learning_files/libs/quarto-html/tabby.min.js"></script>
+  <script src="parameter_learning_files/libs/quarto-html/popper.min.js"></script>
+  <script src="parameter_learning_files/libs/quarto-html/tippy.umd.min.js"></script>
+  <link href="parameter_learning_files/libs/quarto-html/tippy.css" rel="stylesheet">
+  <link href="parameter_learning_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet">
+  <link href="parameter_learning_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet">
+  <link href="parameter_learning_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="parameter_learning_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="parameter_learning_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="parameter_learning_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="parameter_learning_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="parameter_learning_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+
+  .callout {
+    margin-top: 1em;
+    margin-bottom: 1em;  
+    border-radius: .25rem;
+  }
+
+  .callout.callout-style-simple { 
+    padding: 0em 0.7em;
+    border-left: solid #acacac .3rem;
+    border-right: solid 1px silver;
+    border-top: solid 1px silver;
+    border-bottom: solid 1px silver;
+    display: flex;
+  }
+
+  .callout.callout-style-default {
+    border-left: solid #acacac .3rem;
+    border-right: solid 1px silver;
+    border-top: solid 1px silver;
+    border-bottom: solid 1px silver;
+  }
+
+  .callout .callout-body-container {
+    flex-grow: 1;
+  }
+
+  .callout.callout-style-simple .callout-body {
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  .callout.callout-style-default .callout-body {
+    font-size: 0.9rem;
+    font-weight: 400;
+  }
+
+  .callout.callout-captioned.callout-style-simple .callout-body {
+    margin-top: 0.2em;
+  }
+
+  .callout:not(.callout-captioned) .callout-body {
+      display: flex;
+  }
+
+  .callout:not(.no-icon).callout-captioned.callout-style-simple .callout-content {
+    padding-left: 1.6em;
+  }
+
+  .callout.callout-captioned .callout-header {
+    padding-top: 0.2em;
+    margin-bottom: -0.2em;
+  }
+
+  .callout.callout-captioned .callout-caption  p {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+    
+  .callout.callout-captioned.callout-style-simple .callout-content  p {
+    margin-top: 0;
+  }
+
+  .callout.callout-captioned.callout-style-default .callout-content  p {
+    margin-top: 0.7em;
+  }
+
+  .callout.callout-style-simple div.callout-caption {
+    border-bottom: none;
+    font-size: .9rem;
+    font-weight: 600;
+    opacity: 75%;
+  }
+
+  .callout.callout-style-default  div.callout-caption {
+    border-bottom: none;
+    font-weight: 600;
+    opacity: 85%;
+    font-size: 0.9rem;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  .callout.callout-style-default div.callout-content {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  .callout.callout-style-simple .callout-icon::before {
+    height: 1rem;
+    width: 1rem;
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 1rem 1rem;
+  }
+
+  .callout.callout-style-default .callout-icon::before {
+    height: 0.9rem;
+    width: 0.9rem;
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 0.9rem 0.9rem;
+  }
+
+  .callout-caption {
+    display: flex
+  }
+    
+  .callout-icon::before {
+    margin-top: 1rem;
+    padding-right: .5rem;
+  }
+
+  .callout.no-icon::before {
+    display: none !important;
+  }
+
+  .callout.callout-captioned .callout-body > :last-child,
+  .callout.callout-captioned .callout-body > div > :last-child {
+    margin-bottom: 0.5rem;
+  }
+
+  .callout.callout-captioned .callout-icon::before {
+    margin-top: .5rem;
+    padding-right: .5rem;
+  }
+
+  .callout:not(.callout-captioned) .callout-icon::before {
+    margin-top: 1rem;
+    padding-right: .5rem;
+  }
+
+  /* Callout Types */
+
+  div.callout-note {
+    border-left-color: #4582ec !important;
+  }
+
+  div.callout-note .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEU0lEQVRYCcVXTWhcVRQ+586kSUMMxkyaElstCto2SIhitS5Ek8xUKV2poatCcVHtUlFQk8mbaaziwpWgglJwVaquitBOfhQXFlqlzSJpFSpIYyXNjBNiTCck7x2/8/LeNDOZxDuEkgOXe++553zfefee+/OYLOXFk3+1LLrRdiO81yNqZ6K9cG0P3MeFaMIQjXssE8Z1JzLO9ls20MBZX7oG8w9GxB0goaPrW5aNMp1yOZIa7Wv6o2ykpLtmAPs/vrG14Z+6d4jpbSKuhdcSyq9wGMPXjonwmESXrriLzFGOdDBLB8Y6MNYBu0dRokSygMA/mrun8MGFN3behm6VVAwg4WR3i6FvYK1T7MHo9BK7ydH+1uurECoouk5MPRyVSBrBHMYwVobG2aOXM07sWrn5qgB60rc6mcwIDJtQrnrEr44kmy+UO9r0u9O5/YbkS9juQckLed3DyW2XV/qWBBB3ptvI8EUY3I9p/67OW+g967TNr3Sotn3IuVlfMLVnsBwH4fsnebJvyGm5GeIUA3jljERmrv49SizPYuq+z7c2H/jlGC+Ghhupn/hcapqmcudB9jwJ/3jvnvu6vu5lVzF1fXyZuZZ7U8nRmVzytvT+H3kilYvH09mLWrQdwFSsFEsxFVs5fK7A0g8gMZjbif4ACpKbjv7gNGaD8bUrlk8x+KRflttr22JEMRUbTUwwDQScyzPgedQHZT0xnx7ujw2jfVfExwYHwOsDTjLdJ2ebmeQIlJ7neo41s/DrsL3kl+W2lWvAga0tR3zueGr6GL78M3ifH0rGXrBC2aAR8uYcIA5gwV8zIE8onoh8u0Fca/ciF7j1uOzEnqcIm59sEXoGc0+z6+H45V1CvAvHcD7THztu669cnp+L0okAeIc6zjbM/24LgGM1gZk7jnRu1aQWoU9sfUOuhrmtaPIO3YY1KLLWZaEO5TKUbMY5zx8W9UJ6elpLwKXbsaZ4EFl7B4bMtDv0iRipKoDQT2sNQI9b1utXFdYisi+wzZ/ri/1m7QfDgEuvgUUEIJPq3DhX/5DWNqIXDOweC2wvIR90Oq3lDpdMIgD2r0dXvGdsEW5H6x6HLRJYU7C69VefO1x8Gde1ZFSJLfWS1jbCnhtOPxmpfv2LXOA2Xk2tvnwKKPFuZ/oRmwBwqRQDcKNeVQkYcOjtWVBuM/JuYw5b6isojIkYxyYAFn5K7ZBF10fea52y8QltAg6jnMqNHFBmGkQ1j+U43HMi2xMar1Nv0zGsf1s8nUsmUtPOOrbFIR8bHFDMB5zL13Gmr/kGlCkUzedTzzmzsaJXhYawnA3UmARpiYj5ooJZiUoxFRtK3X6pgNPv+IZVPcnwbOl6f+aBaO1CNvPW9n9LmCp01nuSaTRF2YxHqZ8DYQT6WsXT+RD6eUztwYLZ8rM+rcPxamv1VQzFUkzFXvkiVrySGQgJNvXHJAxiU3/NwiC03rSf05VBaPtu/Z7/B8Yn/w7eguloAAAAAElFTkSuQmCC');
+  }
+
+  div.callout-note.callout-style-default .callout-caption {
+    background-color: #dae6fb
+  }
+
+  div.callout-important {
+    border-left-color: #d9534f !important;
+  }
+
+  div.callout-important .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEKklEQVRYCcVXTWhcVRS+575MJym48A+hSRFr00ySRQhURRfd2HYjk2SSTokuBCkU2o0LoSKKraKIBTcuFCoidGFD08nkBzdREbpQ1EDNIv8qSGMFUboImMSZd4/f9zJv8ibJMC8xJQfO3HPPPef7zrvvvnvviIkpC9nsw0UttFunbUhpFzFtarSd6WJkStVMw5xyVqYTvkwfzuf/5FgtkVoB0729j1rjXwThS7Vio+Mo6DNnvLfahoZ+i/o32lULuJ3NNiz7q6+pyAUkJaFF6JwaM2lUJlV0MlnQn5aTRbEu0SEqHUa0A4AdiGuB1kFXRfVyg5d87+Dg4DL6m2TLAub60ilj7A1Ec4odSAc8X95sHh7+ZRPCFo6Fnp7HfU/fBng/hi10CjCnWnJjsxvDNxWw0NfV6Rv5GgP3I3jGWXumdTD/3cbEOP2ZbOZp69yniG3FQ9z1jD7bnBu9Fc2tKGC2q+uAJOQHBDRiZX1x36o7fWBs7J9ownbtO+n0/qWkvW7UPIfc37WgT6ZGR++EOJyeQDSb9UB+DZ1G6DdLDzyS+b/kBCYGsYgJbSQHuThGKRcw5xdeQf8YdNHsc6ePXrlSYMBuSIAFTGAtQo+VuALo4BX83N190NWZWbynBjhOHsmNfFWLeL6v+ynsA58zDvvAC8j5PkbOcXCMg2PZFk3q8MjI7WAG/Dp9AwP7jdGBOOQkAvlFUB+irtm16I1Zw9YBcpGTGXYmk3kQIC/Cds55l+iMI3jqhjAuaoe+am2Jw5GT3Nbz3CkE12NavmzN5+erJW7046n/CH1RO/RVa8lBLozXk9uqykkGAyRXLWlLv5jyp4RFsG5vGVzpDLnIjTWgnRy2Rr+tDKvRc7Y8AyZq10jj8DqXdnIRNtFZb+t/ZRtXcDiVnzpqx8mPcDWxgARUqx0W1QB9MeUZiNrV4qP+Ehc+BpNgATsTX8ozYKL2NtFYAHc84fG7ndxUPr+AR/iQSns7uSUufAymwDOb2+NjK27lEFocm/EE2WpyIy/Hi66MWuMKJn8RvxIcj87IM5Vh9663ziW36kR0HNenXuxmfaD8JC7tfKbrhFr7LiZCrMjrzTeGx+PmkosrkNzW94ObzwocJ7A1HokLolY+AvkTiD/q1H0cN48c5EL8Crkttsa/AXQVDmutfyku0E7jShx49XqV3MFK8IryDhYVbj7Sj2P2eBxwcXoe8T8idsKKPRcnZw1b+slFTubwUwhktrfnAt7J++jwQtLZcm3sr9LQrjRzz6cfMv9aLvgmnAGvpoaGLxM4mAEaLV7iAzQ3oU0IvD5x9ix3yF2RAAuYAOO2f7PEFWCXZ4C9Pb2UsgDeVnFSpbFK7/IWu7TPTvBqzbGdCHOJQSxiEjt6IyZmxQyEJHv6xyQsYk//moVFsN2zP6fRImjfq7/n/wFDguUQFNEwugAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-important.callout-style-default .callout-caption {
+    background-color: #f7dddc
+  }
+
+  div.callout-warning {
+    border-left-color: #f0ad4e !important;
+  }
+
+  div.callout-warning .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAETklEQVRYCeVWW2gcVRg+58yaTUnizqbipZeX4uWhBEniBaoUX1Ioze52t7sRq6APio9V9MEaoWlVsFasRq0gltaAPuxms8lu0gcviE/FFOstVbSIxgcv6SU7EZqmdc7v9+9mJtNks51NTUH84ed889/PP+cmxP+d5FIbMJmNbpREu4WUkiTtCicKny0l1pIKmBzovF2S+hIJHX8iEu3hZJ5lNZGqyRrGSIQpq15AzF28jgpeY6yk6GVdrfFqdrD6Iw+QlB8g0YS2g7dyQmXM/IDhBhT0UCiRf59lfqmmDvzRt6kByV/m4JjtzuaujMUM2c5Z2d6JdKrRb3K2q6mA+oYVz8JnDdKPmmNthzkAk/lN63sYPgevrguc72aZX/L9C6x09GYyxBgCX4NlvyGUHOKELlm5rXeR1kchuChJt4SSwyddZRXgvwMGvYo4QSlk3/zkHD8UHxwVJA6zjZZqP8v8kK8OWLnIZtLyCAJagYC4rTGW/9Pqj92N/c+LUaAj27movwbi19tk/whRCIE7Q9vyI6yvRpftAKVTdUjOW40X3h5OXsKCdmFcx0xlLJoSuQngnrJe7Kcjm4OMq9FlC7CMmScQANuNvjfP3PjGXDBaUQmbp296S5L4DrpbrHN1T87ZVEZVCzg1FF0Ft+dKrlLukI+/c9ENo+TvlTDbYFvuKPtQ9+l052rXrgKoWkDAFnvh0wTOmYn8R5f4k/jN/fZiCM1tQx9jQQ4ANhqG4hiL0qIFTGViG9DKB7GYzgubnpofgYRwO+DFjh0Zin2m4b/97EDkXkc+f6xYAPX0KK2I/7fUQuwzuwo/L3AkcjugPNixC8cHf0FyPjWlItmLxWw4Ou9YsQCr5fijMGoD/zpdRy95HRysyXA74MWOnscpO4j2y3HAVisw85hX5+AFBRSHt4ShfLFkIMXTqyKFc46xdzQM6XbAi702a7sy04J0+feReMFKp5q9esYLCqAZYw/k14E/xcLLsFElaornTuJB0svMuJINy8xkIYuL+xPAlWRceH6+HX7THJ0djLUom46zREu7tTkxwmf/FdOZ/sh6Q8qvEAiHpm4PJ4a/doJe0gH1t+aHRgCzOvBvJedEK5OFE5jpm4AGP2a8Dxe3gGJ/pAutug9Gp6he92CsSsWBaEcxGx0FHytmIpuqGkOpldqNYQK8cSoXvd+xLxXADw0kf6UkJNFtdo5MOgaLjiQOQHcn+A6h5NuL2s0qsC2LOM75PcF3yr5STuBSAcGG+meA14K/CI21HcS4LBT6tv0QAh8Dr5l93AhZzG5ZJ4VxAqdZUEl9z7WJ4aN+svMvwHHL21UKTd1mqvChH7/Za5xzXBBKrUcB0TQ+Ulgkfbi/H/YT5EptrGzsEK7tR1B7ln9BBwckYfMiuSqklSznIuoIIOM42MQO+QnduCoFCI0bpkzjCjddHPN/F+2Yu+sd9bKNpVwHhbS3LluK/0zgfwD0xYI5dXuzlQAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-warning.callout-style-default .callout-caption {
+    background-color: #fcefdc
+  }
+
+  div.callout-tip {
+    border-left-color: #02b875 !important;
+  }
+
+  div.callout-tip .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAADr0lEQVRYCe1XTWgTQRj9ZjZV8a9SPIkKgj8I1bMHsUWrqYLVg4Ue6v9BwZOxSYsIerFao7UiUryIqJcqgtpimhbBXoSCVxUFe9CTiogUrUp2Pt+3aUI2u5vdNh4dmMzOzHvvezuz8xNFM0mjnbXaNu1MvFWRXkXEyE6aYOYJpdW4IXuA4r0fo8qqSMDBU0v1HJUgVieAXxzCsdE/YJTdFcVIZQNMyhruOMJKXYFoLfIfIvVIMWdsrd+Rpd86ZmyzzjJmLStqRn0v8lzkb4rVIXvnpScOJuAn2ACC65FkPzEdEy4TPWRLJ2h7z4cArXzzaOdKlbOvKKX25Wl00jSnrwVxAg3o4dRxhO13RBSdNvH0xSARv3adTXbBdTf64IWO2vH0LT+cv4GR1DJt+DUItaQogeBX/chhbTBxEiZ6gftlDNXTrvT7co4ub5A6gp9HIcHvzTa46OS5fBeP87Qm0fQkr4FsYgVQ7Qg+ZayaDg9jhg1GkWj8RG6lkeSacrrHgDaxdoBiZPg+NXV/KifMuB6//JmYH4CntVEHy/keA6x4h4CU5oFy8GzrBS18cLJMXcljAKB6INjWsRcuZBWVaS3GDrqB7rdapVIeA+isQ57Eev9eCqzqOa81CY05VLd6SamW2wA2H3SiTbnbSxmzfp7WtKZkqy4mdyAlGx7ennghYf8voqp9cLSgKdqNfa6RdRsAAkPwRuJZNbpByn+RrJi1RXTwdi8RQF6ymDwGMAtZ6TVE+4uoKh+MYkcLsT0Hk8eAienbiGdjJHZTpmNjlbFJNKDVAp2fJlYju6IreQxQ08UJDNYdoLSl6AadO+fFuCQqVMB1NJwPm69T04Wv5WhfcWyfXQB+wXRs1pt+nCknRa0LVzSA/2B+a9+zQJadb7IyyV24YAxKp2Jqs3emZTuNnKxsah+uabKbMk7CbTgJx/zIgQYErIeTKRQ9yD9wxVof5YolPHqaWo7TD6tJlh7jQnK5z2n3+fGdggIOx2kaa2YI9QWarc5Ce1ipNWMKeSG4DysFF52KBmTNMmn5HqCFkwy34rDg05gDwgH3bBi+sgFhN/e8QvRn8kbamCOhgrZ9GJhFDgfcMHzFb6BAtjKpFhzTjwv1KCVuxHvCbsSiEz4CANnj84cwHdFXAbAOJ4LTSAawGWFn5tDhLMYz6nWeU2wJfIhmIJBefcd/A5FWQWGgrWzyORZ3Q6HuV+Jf0Bj+BTX69fm1zWgK7By1YTXchFDORywnfQ7GpzOo6S+qECrsx2ifVQAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-tip.callout-style-default .callout-caption {
+    background-color: #ccf1e3
+  }
+
+  div.callout-caution {
+    border-left-color: #fd7e14 !important;
+  }
+
+  div.callout-caution .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAACV0lEQVRYCdVWzWoUQRCuqp2ICBLJXgITZL1EfQDBW/bkzUMUD7klD+ATSHBEfAIfQO+iXsWDxJsHL96EHAwhgzlkg8nBg25XWb0zIb0zs9muYYWkoKeru+vn664fBqElyZNuyh167NXJ8Ut8McjbmEraKHkd7uAnAFku+VWdb3reSmRV8PKSLfZ0Gjn3a6Xlcq9YGb6tADjn+lUfTXtVmaZ1KwBIvFI11rRXlWlatwIAAv2asaa9mlB9wwygiDX26qaw1yYPzFXg2N1GgG0FMF8Oj+VIx7E/03lHx8UhvYyNZLN7BwSPgekXXLribw7w5/c8EF+DBK5idvDVYtEEwMeYefjjLAdEyQ3M9nfOkgnPTEkYU+sxMq0BxNR6jExrAI31H1rzvLEfRIdgcv1XEdj6QTQAS2wtstEALLG1yEZ3QhH6oDX7ExBSFEkFINXH98NTrme5IOaaA7kIfiu2L8A3qhH9zRbukdCqdsA98TdElyeMe5BI8Rs2xHRIsoTSSVFfCFCWGPn9XHb4cdobRIWABNf0add9jakDjQJpJ1bTXOJXnnRXHRf+dNL1ZV1MBRCXhMbaHqGI1JkKIL7+i8uffuP6wVQAzO7+qVEbF6NbS0LJureYcWXUUhH66nLR5rYmva+2tjRFtojkM2aD76HEGAD3tPtKM309FJg5j/K682ywcWJ3PASCcycH/22u+Bh7Aa0ehM2Fu4z0SAE81HF9RkB21c5bEn4Dzw+/qNOyXr3DCTQDMBOdhi4nAgiFDGCinIa2owCEChUwD8qzd03PG+qdW/4fDzjUMcE1ZpIAAAAASUVORK5CYII=');
+  }
+
+  div.callout-caution.callout-style-default .callout-caption {
+    background-color: #ffe5d0
+  }
+
+  </style>
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal #title-slide.center,
+    .reveal .title-slide.center,
+    .reveal .controls .navigate-left .controls-arrow,
+    .reveal .controls .navigate-right .controls-arrow {
+      margin-top: -15px;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="center">
+  <h1 class="title">Chapter 4: Parameter learning</h1>
+  <p class="subtitle">Lode Nachtergaele</p>
+</section>
+
+<section id="parameter-learning-toc" class="slide level2">
+<h2>Parameter Learning TOC</h2>
+<ul>
+<li>4.1 Maximum Likelihood Parameter Learning</li>
+<li>4.2 Bayesian Parameter Learning</li>
+<li>4.3 Nonparametric Learning</li>
+<li>4.4 Learning with Missing Data</li>
+<li>4.5 Summary</li>
+<li>4.6 Excercises</li>
+</ul>
+</section>
+<section id="bayesian-network" class="slide level2">
+<h2>Bayesian network</h2>
+<pre><code>                                                   S │ P(S)
+   B │ P(B)   ┌─────────┐                ┌─────┐  ───┼─────
+  ───┼─────   │ Battery ├───┐    ┌───────┤Solar│   0 │ 0.98
+   0 │ 0.99   └─────────┘   │    │       └─────┘   1 │ 0.02
+   1 │ 0.01                 │    │
+                            │    │             E B S │ P(E|B,S)
+                            │    │            ───────┼─────────
+                            │    │             0 0 0 │    0.95
+                       ┌────▼────▼────┐        0 0 1 │    0.04
+                       │   Electrical │        0 1 0 │    0.06
+                   ┌───┤System Failure├─┐      0 1 1 │    0.01
+                   │   └──────────────┘ │      1 0 0 │    0.10
+                   │                    │      1 0 1 │    0.96
+                   │                    │      1 1 0 │    0.96
+                   │                    │      1 1 1 │    0.99
+              ┌────▼─────────┐     ┌────▼─────┐
+ C E │P(C|E)  │Communication │     │Trajectory│  D E │P(D|E)
+─────┼──────  │    Loss      │     │ Deviation│ ─────┼──────
+ 0 0 │ 0.98   └──────────────┘     └──────────┘  0 0 │ 0.96
+ 0 1 │ 0.01                                      0 1 │ 0.03
+ 1 0 │ 0.02                                      1 0 │ 0.04
+ 1 1 │ 0.99                                      1 1 │ 0.97</code></pre>
+<!-- ## 4.2.3 Bayesian learning for bayesian networks
+
+![](images/sattelite_example.png)
+
+## 4.2.3 Bayesian networks in Julia
+
+![](images/example_2_5_satellite_G_in_julia.png) -->
+</section>
+<section id="bayesian-learning-for-bayesian-networks" class="slide level2">
+<h2>4.2.3 Bayesian learning for bayesian networks</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource julia number-lines code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># Example 2.5</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>B <span class="op">=</span> <span class="fu">Variable</span>(<span class="op">:</span>b, <span class="fl">2</span>); S <span class="op">=</span> <span class="fu">Variable</span>(<span class="op">:</span>s, <span class="fl">2</span>)</span>
+<span id="cb2-3"><a href="#cb2-3"></a>E <span class="op">=</span> <span class="fu">Variable</span>(<span class="op">:</span><span class="cn">e</span>, <span class="fl">2</span>)</span>
+<span id="cb2-4"><a href="#cb2-4"></a>D <span class="op">=</span> <span class="fu">Variable</span>(<span class="op">:</span>d, <span class="fl">2</span>); C <span class="op">=</span> <span class="fu">Variable</span>(<span class="op">:</span>c, <span class="fl">2</span>)</span>
+<span id="cb2-5"><a href="#cb2-5"></a>vars <span class="op">=</span> [B, S, E, D, C]</span>
+<span id="cb2-6"><a href="#cb2-6"></a>factors <span class="op">=</span> [</span>
+<span id="cb2-7"><a href="#cb2-7"></a>  <span class="fu">Factor</span>([B], <span class="fu">FactorTable</span>((b<span class="op">=</span><span class="fl">1</span>,) <span class="op">=&gt;</span> <span class="fl">0.99</span>, (b<span class="op">=</span><span class="fl">2</span>,) <span class="op">=&gt;</span> <span class="fl">0.01</span>)),</span>
+<span id="cb2-8"><a href="#cb2-8"></a>  <span class="fu">Factor</span>([S], <span class="fu">FactorTable</span>((s<span class="op">=</span><span class="fl">1</span>,) <span class="op">=&gt;</span> <span class="fl">0.98</span>, (s<span class="op">=</span><span class="fl">2</span>,) <span class="op">=&gt;</span> <span class="fl">0.02</span>)),</span>
+<span id="cb2-9"><a href="#cb2-9"></a>  <span class="fu">Factor</span>([E,B,S], <span class="fu">FactorTable</span>(</span>
+<span id="cb2-10"><a href="#cb2-10"></a>    (<span class="cn">e</span><span class="op">=</span><span class="fl">1</span>,b<span class="op">=</span><span class="fl">1</span>,s<span class="op">=</span><span class="fl">1</span>) <span class="op">=&gt;</span> <span class="fl">0.90</span>, (<span class="cn">e</span><span class="op">=</span><span class="fl">1</span>,b<span class="op">=</span><span class="fl">1</span>,s<span class="op">=</span><span class="fl">2</span>) <span class="op">=&gt;</span> <span class="fl">0.04</span>,</span>
+<span id="cb2-11"><a href="#cb2-11"></a>    (<span class="cn">e</span><span class="op">=</span><span class="fl">1</span>,b<span class="op">=</span><span class="fl">2</span>,s<span class="op">=</span><span class="fl">1</span>) <span class="op">=&gt;</span> <span class="fl">0.05</span>, (<span class="cn">e</span><span class="op">=</span><span class="fl">1</span>,b<span class="op">=</span><span class="fl">2</span>,s<span class="op">=</span><span class="fl">2</span>) <span class="op">=&gt;</span> <span class="fl">0.01</span>,</span>
+<span id="cb2-12"><a href="#cb2-12"></a>    (<span class="cn">e</span><span class="op">=</span><span class="fl">2</span>,b<span class="op">=</span><span class="fl">1</span>,s<span class="op">=</span><span class="fl">1</span>) <span class="op">=&gt;</span> <span class="fl">0.10</span>, (<span class="cn">e</span><span class="op">=</span><span class="fl">2</span>,b<span class="op">=</span><span class="fl">1</span>,s<span class="op">=</span><span class="fl">2</span>) <span class="op">=&gt;</span> <span class="fl">0.96</span>, </span>
+<span id="cb2-13"><a href="#cb2-13"></a>    (<span class="cn">e</span><span class="op">=</span><span class="fl">2</span>,b<span class="op">=</span><span class="fl">2</span>,s<span class="op">=</span><span class="fl">1</span>) <span class="op">=&gt;</span> <span class="fl">0.95</span>, (<span class="cn">e</span><span class="op">=</span><span class="fl">2</span>,b<span class="op">=</span><span class="fl">2</span>,s<span class="op">=</span><span class="fl">2</span>) <span class="op">=&gt;</span> <span class="fl">0.99</span>)),</span>
+<span id="cb2-14"><a href="#cb2-14"></a>  <span class="fu">Factor</span>([D, E], <span class="fu">FactorTable</span>(</span>
+<span id="cb2-15"><a href="#cb2-15"></a>    (d<span class="op">=</span><span class="fl">1</span>,<span class="cn">e</span><span class="op">=</span><span class="fl">1</span>) <span class="op">=&gt;</span> <span class="fl">0.96</span>, (d<span class="op">=</span><span class="fl">1</span>,<span class="cn">e</span><span class="op">=</span><span class="fl">2</span>) <span class="op">=&gt;</span> <span class="fl">0.03</span>,</span>
+<span id="cb2-16"><a href="#cb2-16"></a>    (d<span class="op">=</span><span class="fl">2</span>,<span class="cn">e</span><span class="op">=</span><span class="fl">1</span>) <span class="op">=&gt;</span> <span class="fl">0.04</span>, (d<span class="op">=</span><span class="fl">2</span>,<span class="cn">e</span><span class="op">=</span><span class="fl">2</span>) <span class="op">=&gt;</span> <span class="fl">0.97</span>)),</span>
+<span id="cb2-17"><a href="#cb2-17"></a>  <span class="fu">Factor</span>([C, E], <span class="fu">FactorTable</span>(</span>
+<span id="cb2-18"><a href="#cb2-18"></a>    (c<span class="op">=</span><span class="fl">1</span>,<span class="cn">e</span><span class="op">=</span><span class="fl">1</span>) <span class="op">=&gt;</span> <span class="fl">0.98</span>, (c<span class="op">=</span><span class="fl">1</span>,<span class="cn">e</span><span class="op">=</span><span class="fl">2</span>) <span class="op">=&gt;</span> <span class="fl">0.01</span>, (c<span class="op">=</span><span class="fl">2</span>,<span class="cn">e</span><span class="op">=</span><span class="fl">1</span>) <span class="op">=&gt;</span> <span class="fl">0.02</span>, (c<span class="op">=</span><span class="fl">2</span>,<span class="cn">e</span><span class="op">=</span><span class="fl">2</span>) <span class="op">=&gt;</span> <span class="fl">0.99</span>))</span>
+<span id="cb2-19"><a href="#cb2-19"></a>]</span>
+<span id="cb2-20"><a href="#cb2-20"></a>graph <span class="op">=</span> <span class="fu">SimpleDiGraph</span>(<span class="fl">5</span>)</span>
+<span id="cb2-21"><a href="#cb2-21"></a><span class="fu">add_edge!</span>(graph, <span class="fl">1</span>, <span class="fl">3</span>); <span class="fu">add_edge!</span>(graph, <span class="fl">2</span>, <span class="fl">3</span>)</span>
+<span id="cb2-22"><a href="#cb2-22"></a><span class="fu">add_edge!</span>(graph, <span class="fl">3</span>, <span class="fl">4</span>); <span class="fu">add_edge!</span>(graph, <span class="fl">3</span>, <span class="fl">5</span>) </span>
+<span id="cb2-23"><a href="#cb2-23"></a>bn <span class="op">=</span> <span class="fu">BayesianNetwork</span>(vars, factors, graph)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="probabilistic-machine-learning" class="slide level2">
+<h2>Probabilistic Machine learning</h2>
+<div class="columns">
+<div class="column" style="width:40%;">
+<div id="fig-anonymous-8401878" class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="https://probml.github.io/pml-book/book1.html"><img data-src="images/probalistic_machine_learning.png"></a></p>
+</figure>
+</div>
+</div><div class="column" style="width:60%;">
+
+</div>
+</div>
+</section>
+<section id="maximum-likehood-parameter-learning" class="slide level2">
+<h2>4.1 Maximum Likehood Parameter Learning</h2>
+<p><span class="math display">\[
+\hat\theta = \underset{\theta}{\mathrm{arg \;  max}} \; P(D \mid \theta)
+\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(\theta\)</span> represents the parameters of a distribution</li>
+<li><span class="math inline">\(P(D \mid \theta)\)</span> is the likelihood that the probability model assigns to data D when model parameters are set to <span class="math inline">\(\theta\)</span></li>
+<li><span class="math inline">\(\hat\theta\)</span> is the estimate of the parameter hence the hat</li>
+</ul>
+</section>
+<section id="two-challenges-to-calculate-arg-max" class="slide level2">
+<h2>Two challenges to calculate arg max</h2>
+<ol type="1">
+<li>Choosing appropriate model by which we define <span class="math inline">\(P(D \mid \theta)\)</span>
+<ul>
+<li>Assume samples of data D are <em>independently and identically distributed</em></li>
+<li><span class="math inline">\(P(D \mid \theta) = \underset{i}{\prod} P(o_{i} \mid \theta)\)</span></li>
+</ul></li>
+<li>Performing maximisation
+<ul>
+<li>For common probability models: analytically, others difficult. But log function is monotonically increasing</li>
+<li><span class="math inline">\(\hat\theta = \underset{\theta}{\mathrm{arg \; max}} \; \sum_{i} \log P(o_{i} \mid \theta)\)</span></li>
+</ul></li>
+</ol>
+</section>
+<section id="maximum-likelihood-estimates-for-categorical-distribution" class="slide level2">
+<h2>4.1.1 Maximum likelihood estimates for categorical distribution</h2>
+<p><span class="math display">\[P(D \mid \theta) = \theta^{n}(1 - \theta)^{m-n}\]</span></p>
+<p>Log likelihood: <span class="math display">\[
+\begin{align}
+l(\theta) &amp; = \log (\theta^{n}(1 - \theta)^{m-n}) \\
+          &amp; = n \log \theta + (m-n) \log(1-\theta) \\
+\end{align}
+\]</span></p>
+</section>
+<section id="maximum-log-likelihood" class="slide level2">
+<h2>Maximum Log likelihood</h2>
+<p><span class="math display">\[
+     l(\theta)  = n \log \theta + (m-n) \log(1-\theta)
+\]</span> Set first derivative of <span class="math inline">\(l\)</span> to zero: <span class="math display">\[
+\frac{\partial}{\partial \theta} l(\theta) = \frac{n}{\theta} - \frac{m-n}{1-\theta}
+\]</span> Solving for <span class="math inline">\(\hat\theta\)</span> by setting the derivative to zero: <span class="math display">\[
+\frac{n}{\hat\theta} - \frac{m-n}{1-\hat\theta}  = 0 \implies \hat\theta = \frac{n}{m}
+\]</span></p>
+</section>
+<section id="maximum-likelihood-for-variable-x-with-k-values" class="slide level2">
+<h2>4.1.1 Maximum likelihood for variable X with k values</h2>
+<p>Maximum likelihood estimate <span class="math inline">\(P(x^{i} \mid n_{1:k})\)</span> is given by <span class="math display">\[
+\begin{align}
+\hat\theta_{i} &amp; = \frac{n_i}{\sum_{j=1}^{k} n_{j}} \\
+\end{align}
+\]</span></p>
+</section>
+<section id="maximum-likelihood-gender-after-3-muffins" class="slide level2">
+<h2>Maximum likelihood gender after 3 muffins</h2>
+<p>Guppi matched you with 1 non-binary, 1 female and 2 males. Most likely gender next muffin session: <span class="math display">\[
+\begin{align}
+\hat\theta_{nb} &amp;= \frac{1}{1+1+2}  = 1/4\\
+\hat\theta_{f} &amp;= \frac{1}{1+1+2} = 1/4 \\
+\hat\theta_{m} &amp;= \frac{2}{1+1+2} = 2/4 \\
+\end{align}
+\]</span></p>
+</section>
+<section id="mle-for-gaussian-distributions" class="slide level2">
+<h2>4.1.2 MLE for Gaussian distributions</h2>
+<p>Gaussian probability density at x: <span class="math display">\[
+\mathcal{N}(x \mid \mu, \sigma^{2}) = \frac{1}{\sigma}\phi \left( \frac{x-\mu}{\sigma} \right)
+\]</span> with <span class="math inline">\(\phi\)</span> is the standard normal density function: <span class="math display">\[
+\phi(x) = \frac{1}{\sqrt{2\pi}} \exp \left( -\frac{x^{2}}{2} \right)
+\]</span></p>
+</section>
+<section id="log-likelihood-gaussian" class="slide level2">
+<h2>Log likelihood Gaussian</h2>
+<p><span class="math display">\[
+l(\mu, \sigma^{2}) \propto -m \log \sigma - \frac{\sum_{i=1}^{m} (o_{i}-\mu)^{2}}{2\sigma^{2}}
+\]</span></p>
+<p><span class="math display">\[
+\begin{align}
+\frac{\partial}{\partial \mu} l(\mu, \sigma^{2}) &amp; = \frac{\sum_{i}(o_{i}-\hat\mu)}{\hat\sigma^{2}} = 0 \\
+&amp; = -\frac{m}{\hat\sigma} + \frac{\sum_{i}(o_{i}-\hat\mu)^{2}}{\hat\sigma^{3}} \\
+\end{align}
+\]</span></p>
+</section>
+<section id="mle-for-gaussian-distributions-1" class="slide level2">
+<h2>4.1.2 MLE for Gaussian distributions</h2>
+<p><span class="math display">\[
+\hat\mu = \frac{\sum_{i}o_{i}}{m} \; \hat\sigma = \frac{\sum_{i} (o_{i}-\hat\mu)^{2}}{m}
+\]</span></p>
+</section>
+<section id="mle-for-bayesian-networks" class="slide level2">
+<h2>4.1.3 MLE for Bayesian networks</h2>
+<p><span class="math display">\[
+\hat\theta_{ijk} = \frac{m_{ijk}}{\sum{k^{j}}m_{ijk}}
+\]</span></p>
+</section>
+<section id="mle-fail-with-small-data" class="slide level2">
+<h2>MLE fail with small data</h2>
+<p>You had 2 muffin session with a man. What is the MLE for next muffin session ?</p>
+<p><span class="math display">\[ \hat\theta = \frac{2}{2} = 1 \]</span></p>
+<p>Help! Bayes to the rescue.</p>
+</section>
+<section id="bayes" class="slide level2">
+<h2>Bayes</h2>
+<p><span class="math display">\[
+\underbrace{P(\theta \mid D)}_\text{posterior} = \frac{\overbrace{p(D \mid \theta)}^\text{likelihood} \overbrace{p(\theta)}^\text{prior}}{\underbrace{p(D)}_\text{marginal likelihood}}
+\]</span></p>
+</section>
+<section id="lagrange-rule-of-succession" class="slide level2">
+<h2>Lagrange: Rule of succession</h2>
+<p>Probability of succes after having s successes in n trials:</p>
+<ul>
+<li>Each <span class="math inline">\(X_{i}\)</span> has the same chance <span class="math inline">\(p\)</span> of being 1.</li>
+<li>That chance is independent.</li>
+<li>The prior distribution over <span class="math inline">\(p\)</span> is uniform: <span class="math inline">\(f(p)=1\)</span> for <span class="math inline">\(0 \leq p \leq 1\)</span> <span class="math display">\[
+P(X_{n+1}=1 \mid S_{n=k})= \frac{k+1}{n+2}.
+\]</span> Probability for a man next muffin = 2+1/2+2 = 3/4 = 75% <a href="https://jonathanweisberg.org/post/inductive-logic-2/">https://jonathanweisberg.org/post/inductive-logic-2/</a></li>
+</ul>
+</section>
+<section id="law-of-unconsious-statistician" class="slide level2">
+<h2>Law of unconsious statistician</h2>
+<p>LOTUS: to calculate the expected value of a function <span class="math inline">\(g(X)\)</span> of a random variable <span class="math inline">\(X\)</span></p>
+<ul>
+<li>when one knows the probability distribution of <span class="math inline">\(X\)</span></li>
+<li>but one does not know the distribution of <span class="math inline">\(g(X)\)</span>.</li>
+</ul>
+<p>If prob dist <span class="math inline">\(X\)</span> is discrete and one knows its PMF <span class="math inline">\(P(X=x)\)</span> (but not <span class="math inline">\(P(X=g(x))\)</span>), then the expected value of <span class="math inline">\(g(X)\)</span> is: <span class="math display">\[
+\operatorname {E}[g(X)]=\sum_{x}g(x)P(X=x),\,
+\]</span> where the sum is over all possible values x of X.</p>
+</section>
+<section id="law-of-unconsious-statistician-1" class="slide level2">
+<h2>Law of unconsious statistician</h2>
+<p>If it is a continuous distribution and one knows its PDF <span class="math inline">\(P(X=x)\)</span> (but not <span class="math inline">\(P(X=g(x))\)</span>), then the expected value of <span class="math inline">\(g(X)\)</span> is <span class="math display">\[
+{\displaystyle \operatorname {E} [g(X)]=\int _{-\infty }^{\infty }g(x)P(X=x)\,\mathrm {d} x}
+\]</span></p>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Law_of_the_unconscious_statistician">Law of the unconscious statistician</a></li>
+<li><a href="https://projects.iq.harvard.edu/stat110/home">Harvard Statistics 101</a></li>
+<li><a href="https://youtu.be/9vp1Ll2NpRw?t=2556">Lecture 14: Location, Scale, and LOTUS | Statistics 110</a></li>
+</ul>
+</section>
+<section id="bayesian-parameter-learning" class="slide level2">
+<h2>4.2 Bayesian Parameter Learning</h2>
+<p>Instead of point estimate we obtain distribution: <span class="math display">\[
+\hat\theta = \operatorname {E}_{\theta \sim p(\cdot \mid D)}[\theta] = \int \theta p(\theta \mid D) d\theta
+\]</span> Maximum a posteriori parameter: <span class="math display">\[
+\hat\theta = \underset{\theta}{\mathrm{arg \;  max}} \; P(\theta \mid D )
+\]</span> Do not confuse with MLE: <span class="math inline">\(\hat\theta = \underset{\theta}{\mathrm{arg \; max}} \; P(D \mid \theta)\)</span></p>
+<!-- ## 4.2 MLE vs MAP
+Key idea: treat parameter $\theta$ as random variable (vector) $\Theta$ with a PDF $f_{\Theta}(\theta)$. -->
+</section>
+<section id="bayes-learning-for-binary-dist" class="slide level2">
+<h2>4.2.1. Bayes learning for binary dist</h2>
+<p><span class="math display">\[
+\begin{align}
+p(\theta \mid o_{1:m}) &amp; \propto p(\theta, o_{1:m}) \\
+&amp; = p(\theta) \prod_{i=1}^{m} P(o_{i} \mid \theta) \\
+&amp; = \prod_{i=1}^{m} P(o_{i} \mid \theta) \\
+&amp; = \prod_{i=1}^{m} \theta^{o_{i}} ( 1-\theta)^{1-o_{i}} \\
+&amp; = \theta^{n} (1-\theta)^{m-n} \\
+\end{align}
+\]</span></p>
+</section>
+<section id="normalization-constant" class="slide level2">
+<h2>4.2.1 Normalization constant</h2>
+<p><span class="math display">\[
+\int_{0}^{1} \theta^{n}(1-\theta)^{m-n}d\theta = \frac{\Gamma(n+1)\Gamma(m-n+1)}{\Gamma(m+2)}
+\]</span> where <span class="math inline">\(\Gamma\)</span> is the gamma function. Hence MAP bin dist:</p>
+<p><span class="math display">\[
+\begin{align}
+p(\theta \mid o_{1:m}) &amp; = \frac{\Gamma(m+2)}{\Gamma(n+1)\Gamma(m-n+1)}\theta^{n} (1-\theta)^{m-n} \\
+&amp; = Beta(\theta \mid n+1, m-n +1) \\
+\end{align}
+\]</span></p>
+</section>
+<section id="example-beta-distribution" class="slide level2">
+<h2>Example Beta distribution</h2>
+<!-- https://bayesiancomputationbook.com/notebooks/chp_01.html -->
+<div class="cell" data-execution_count="1">
+<div class="cell-output-display">
+<p><img data-src="parameter_learning_files/figure-revealjs/cell-2-output-1.png" width="1163" height="587"></p>
+</div>
+</div>
+</section>
+<section id="bayesian-learning-for-categorical-distributions" class="slide level2">
+<h2>4.2.2 Bayesian learning for categorical distributions</h2>
+<p>Suppose <span class="math inline">\(X\)</span> is a discrete random variable that can take integer values from 1 to <span class="math inline">\(n\)</span>. We define the parameters of the distribution to be <span class="math inline">\(\theta_{1:n}\)</span> where <span class="math inline">\(P(x^{i}) = \theta_{i}\)</span>. Dirichlet distribution can represent both prior and posterior distribution and is parameterised by <span class="math inline">\(\alpha_{1:n}\)</span>. The densitity of the Dirichlet distribution: <span class="math display">\[
+Dir(\theta_{1:n} \mid \alpha_{1:n}) = \frac{\Gamma(\alpha_0)}{\prod_{i=1}^{n} \Gamma(\alpha_{i})} \prod_{i=1}^{n} \theta_{i}^{\alpha_{i}-1}
+\]</span></p>
+</section>
+<section id="dirichlet-distribution" class="slide level2">
+<h2>4.2.2 Dirichlet distribution</h2>
+<p>Common to use uniform prior: <span class="math inline">\(\alpha_{1:n} = 1\)</span>. If the prior over <span class="math inline">\(\theta_{1:n}\)</span> is given by <span class="math inline">\(Dir(\alpha_{1:n})\)</span> and there are <span class="math inline">\(m_{i}\)</span> observations of <span class="math inline">\(X = 1\)</span> then the posterior is given by: <span class="math display">\[
+p(\theta_{1:n} \mid \alpha_{1:n}, m_{1:n}) = Dir(\theta_{1:n} \mid \alpha_{1} + m_{1}, \cdots, \alpha_{n} + m_{n})
+\]</span> The distribution <span class="math inline">\(Dir(\alpha_{1:n})\)</span> has a mean vector whose <span class="math inline">\(i\)</span>th component is <span class="math display">\[
+\frac{\alpha_{i}}{\sum_{j=1}^{n} \alpha_{j}}
+\]</span></p>
+</section>
+<section id="bayesian-learning-for-bayesian-networks-1" class="slide level2">
+<h2>4.2.3 Bayesian learning for bayesian networks</h2>
+<p>We can apply Bayesian parameter learning to discrete Bayesian networks. The prior over the Bayesian network parameters <span class="math inline">\(\theta\)</span> can be factorized as follows: <span class="math display">\[
+P(\theta \mid G) = \prod_{i=1}^{n} \prod_{j=1}^{q_{i}} p(\theta_{ij})
+\]</span> where <span class="math inline">\(\theta_{ij} = (\theta_{ij1}, \cdots, \theta_{ijr_{i}})\)</span>.</p>
+</section>
+<section id="bayesian-learning-for-bayesian-networks-2" class="slide level2">
+<h2>4.2.3 Bayesian learning for bayesian networks</h2>
+<p><span class="math display">\[
+P(\theta \mid G) = \prod_{i=1}^{n} \prod_{j=1}^{q_{i}} p(\theta_{ij})
+\]</span> where <span class="math inline">\(\theta_{ij} = (\theta_{ij1}, \cdots, \theta_{ijr_{i}})\)</span>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource julia number-lines code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">function</span> <span class="fu">prior</span>(vars, G)</span>
+<span id="cb3-2"><a href="#cb3-2"></a>  n <span class="op">=</span> <span class="fu">length</span>(vars)</span>
+<span id="cb3-3"><a href="#cb3-3"></a>  r <span class="op">=</span> [vars[i].r for i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>n]</span>
+<span id="cb3-4"><a href="#cb3-4"></a>  q <span class="op">=</span> [<span class="fu">prod</span>([r[j] for j <span class="kw">in</span> <span class="fu">inneighbors</span>(G,i)]) for i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>n]</span>
+<span id="cb3-5"><a href="#cb3-5"></a>  <span class="cf">return</span> [<span class="fu">ones</span>(q[i], r[i]) for i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>n]</span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="bayesian-learning-for-bayesian-networks-3" class="slide level2">
+<h2>4.2.3 Bayesian learning for bayesian networks</h2>
+<p>After observing data in the form of <span class="math inline">\(m_{ijk}\)</span> counts the posterior is then: <span class="math display">\[
+P(\theta_{ij} \mid \alpha_{ij}, m_{ij}) = Dir(\theta_{ij} \mid \alpha_{ij1} + m_{ij1}, \cdots, \alpha_{ijr_{i}} + m_{ijr_{i}})
+\]</span></p>
+</section>
+<section id="algorithm-4.1" class="slide level2">
+<h2>Algorithm 4.1</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource julia number-lines code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">function</span> <span class="fu">sub2ind</span>(siz, x)</span>
+<span id="cb4-2"><a href="#cb4-2"></a>  k <span class="op">=</span> <span class="fu">vcat</span>(<span class="fl">1</span>, <span class="fu">cumprod</span>(siz[<span class="fl">1</span><span class="op">:</span><span class="kw">end</span><span class="op">-</span><span class="fl">1</span>]))</span>
+<span id="cb4-3"><a href="#cb4-3"></a>  <span class="cf">return</span> <span class="fu">dot</span>(k, x <span class="op">.-</span> <span class="fl">1</span>) <span class="op">+</span> <span class="fl">1</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="kw">end</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a></span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="kw">function</span> <span class="fu">statistics</span>(vars, G, D<span class="op">::</span><span class="dt">Matrix{Int}</span>)</span>
+<span id="cb4-7"><a href="#cb4-7"></a>  n <span class="op">=</span> <span class="fu">size</span>(D, <span class="fl">1</span>)</span>
+<span id="cb4-8"><a href="#cb4-8"></a>  r <span class="op">=</span> [vars[i].r for i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>n]</span>
+<span id="cb4-9"><a href="#cb4-9"></a>  q <span class="op">=</span> [<span class="fu">prod</span>([r[j] for j <span class="kw">in</span> <span class="fu">inneighbors</span>(G,i)]) for i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>n]</span>
+<span id="cb4-10"><a href="#cb4-10"></a>  M <span class="op">=</span> [<span class="fu">zeros</span>(q[i], r[i]) for i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>n]</span>
+<span id="cb4-11"><a href="#cb4-11"></a>  <span class="cf">for</span> o <span class="kw">in</span> <span class="fu">eachcol</span>(D)</span>
+<span id="cb4-12"><a href="#cb4-12"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>n</span>
+<span id="cb4-13"><a href="#cb4-13"></a>      k <span class="op">=</span> o[i]</span>
+<span id="cb4-14"><a href="#cb4-14"></a>      parents <span class="op">=</span> <span class="fu">inneighbors</span>(G,i)</span>
+<span id="cb4-15"><a href="#cb4-15"></a>      j<span class="op">=</span><span class="fl">1</span></span>
+<span id="cb4-16"><a href="#cb4-16"></a>      <span class="cf">if</span> !<span class="fu">isempty</span>(parents)</span>
+<span id="cb4-17"><a href="#cb4-17"></a>        j <span class="op">=</span> <span class="fu">sub2ind</span>(r[parents], o[parents])</span>
+<span id="cb4-18"><a href="#cb4-18"></a>      <span class="cf">end</span></span>
+<span id="cb4-19"><a href="#cb4-19"></a>      M[i][j,k] <span class="op">+=</span> <span class="fl">1.0</span></span>
+<span id="cb4-20"><a href="#cb4-20"></a>    <span class="cf">end</span></span>
+<span id="cb4-21"><a href="#cb4-21"></a>  <span class="cf">end</span></span>
+<span id="cb4-22"><a href="#cb4-22"></a>  <span class="cf">return</span> M</span>
+<span id="cb4-23"><a href="#cb4-23"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="example-4.1" class="slide level2">
+<h2>4.2.3 Example 4.1</h2>
+<pre><code> A ────────► B ◄─────── C
+
+        observations
+        ◄────────►
+        1  2  2  1 A
+ D =    1  2  2  1 B
+        2  2  2  2 C
+
+
+ A=1 A=2     B=1 B=2              C=1 C=2
+ ┌─   ─┐    ┌─    ──┐             ┌─   ─┐
+ │2   2│    │ 0   0 │ A=1 &amp; C=1   │0   4│
+ └─   ─┘    │ 0   0 │ A=2 &amp; C=1   └─   ─┘
+            │ 2   0 │ A=1 &amp; C=2
+            │ 0   2 │ A=2 &amp; C=2
+            └──   ──┘</code></pre>
+</section>
+<section id="bayesian-networks-in-julia" class="slide level2">
+<h2>4.2.3 Bayesian networks in Julia</h2>
+
+<img data-src="images/example_4_1.png" class="r-stretch"></section>
+<section id="julia-code-to-calculate-prior-for-g" class="slide level2">
+<h2>Julia code to calculate prior for G</h2>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource julia number-lines code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw">function</span> <span class="fu">prior</span>(vars, G)</span>
+<span id="cb6-2"><a href="#cb6-2"></a>  n <span class="op">=</span> <span class="fu">length</span>(vars)</span>
+<span id="cb6-3"><a href="#cb6-3"></a>  r <span class="op">=</span> [vars[i].r for i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>n]</span>
+<span id="cb6-4"><a href="#cb6-4"></a>  q <span class="op">=</span> [<span class="fu">prod</span>([r[j] for j <span class="kw">in</span> <span class="fu">inneighbors</span>(G,i)]) for i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>n]</span>
+<span id="cb6-5"><a href="#cb6-5"></a>  <span class="cf">return</span> [<span class="fu">ones</span>(q[i], r[i]) for i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>n]</span>
+<span id="cb6-6"><a href="#cb6-6"></a><span class="kw">end</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a>α <span class="op">=</span> <span class="fu">prior</span>(vars, G)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>                  n=3
+        ◄───────────────────────────►
+         r[1]=2   r[2]=2       r[3]=2
+        ┌─   ─┐ ┌─    ──┐ ▲   ┌─   ─┐
+ q[1]=1 │1   1│ │ 1   1 │ │   │1   1│  q[3]=1
+        └─   ─┘ │ 1   1 │ │   └─   ─┘
+                │ 1   1 │ │
+                │ 1   1 │ │q[2]=4
+                └──   ──┘ ▼</code></pre>
+</section>
+<section id="calculating-posterior-parameters-for-graph" class="slide level2">
+<h2>4.2.3 Calculating posterior parameters for graph</h2>
+<!-- ![](images/example_4_2.png) -->
+<pre><code>          ┌─   ─┐ ┌─    ──┐ ┌─   ─┐
+   Prior: │1   1│ │ 1   1 │ │1   1│
+          └─   ─┘ │ 1   1 │ └─   ─┘
+                  │ 1   1 │
+                  │ 1   1 │
+                  └──   ──┘
+          ┌─   ─┐ ┌─    ──┐ ┌─   ─┐
+  Counts: │2   2│ │ 0   0 │ │0   4│
+          └─   ─┘ │ 0   0 │ └─   ─┘
+                  │ 2   0 │
+                  │ 0   2 │
+                  └──   ──┘
+          ┌─   ─┐ ┌─    ──┐ ┌─   ─┐
+Posterior:│3   3│ │ 1   1 │ │1   5│
+          └─   ─┘ │ 1   1 │ └─   ─┘
+                  │ 3   1 │
+                  │ 1   3 │
+                  └──   ──┘</code></pre>
+</section>
+<section id="normalization-of-the-posterior" class="slide level2">
+<h2>4.2.3 Normalization of the posterior</h2>
+<pre><code>          ┌─   ─┐ ┌─    ──┐ ┌─   ─┐
+Posterior:│3   3│ │ 1   1 │ │1   5│
+          └─   ─┘ │ 1   1 │ └─   ─┘
+                  │ 3   1 │
+                  │ 1   3 │
+                  └──   ──┘</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource julia number-lines code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1"></a>θ <span class="op">=</span> [<span class="fu">mapslices</span>(<span class="fu">x-&gt;normalize</span>(x,<span class="fl">1</span>), Mi, dims<span class="op">=</span><span class="fl">2</span>) for Mi <span class="kw">in</span> M <span class="op">+</span> α]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code> ┌─     ─┐ ┌─      ──┐ ┌─     ─┐
+ │0.5 0.5│ │0.5  0.5 │ │1/6 5/6│
+ └─     ─┘ │0.5  0.5 │ └─     ─┘
+           │0.75 0.25│
+           │0.25 0.75│
+           └──     ──┘</code></pre>
+</section>
+<section id="exercise-4.4" class="slide level2">
+<h2>4.2.3 Exercise 4.4</h2>
+<pre><code>         ┌────┐             ┌──                 ──┐
+ X1:     │ X1 │             │ 1 2 1 1 1 2 1 2 1 1 │
+ [1,2]   └─┬──┘             │ 2 2 2 1 2 1 1 1 2 1 │
+           │              D=│ 2 2 2 1 1 1 1 1 2 1 │
+         ┌─▼──┐    ┌────┐   │ 3 2 2 1 1 3 3 1 1 1 │
+ X4:     │ X4 │    │ X3 │   └──                 ──┘
+[1,2,3]  └─┬──┘    └─┬──┘
+           │         │   X3: [1,2]
+ X2:       │  ┌────┐ │
+[1,2]      └──► X2 ◄─┘
+              └────┘
+                  ┌─ ─┐
+     ┌─  ─┐       │3 1│    ┌─  ─┐    ┌─    ─┐
+  M1=│7 3 │  M2=  │0 0│ M3=│6 4 │ M4=│5 0 2 │
+     └─  ─┘       │2 0│    └─  ─┘    │1 1 1 │
+                  │0 2│              └─    ─┘
+                  │0 1│
+                  │0 1│
+                  └─ ─┘</code></pre>
+</section>
+<section id="nonparametric-learning" class="slide level2">
+<h2>4.3 Nonparametric learning</h2>
+<div class="sourceCode" id="cb13"><pre class="sourceCode numberSource julia number-lines code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1"></a><span class="co"># Algorithm 4.3</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a></span>
+<span id="cb13-3"><a href="#cb13-3"></a><span class="fu">gaussian_kernel</span>(b) <span class="op">=</span> <span class="fu">x-&gt;pdf</span>(<span class="fu">Normal</span>(<span class="fl">0</span>,b), x)</span>
+<span id="cb13-4"><a href="#cb13-4"></a></span>
+<span id="cb13-5"><a href="#cb13-5"></a><span class="kw">function</span> <span class="fu">kernel_density_estimate</span>(<span class="cn">φ</span>, O)</span>
+<span id="cb13-6"><a href="#cb13-6"></a>  <span class="cf">return</span> x <span class="op">-&gt;</span> <span class="fu">sum</span>([<span class="fu">φ</span>(x <span class="op">-</span> o) for o <span class="kw">in</span> O])<span class="op">/</span><span class="fu">length</span>(O)</span>
+<span id="cb13-7"><a href="#cb13-7"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><a href="https://jakevdp.github.io/PythonDataScienceHandbook/05.13-kernel-density-estimation.html">Jake VanderPlas: In depth: Kernel density Estimation</a></p>
+</section>
+<section id="learning-with-missing-data" class="slide level2">
+<h2>4.4 Learning with missing data</h2>
+
+<img data-src="images/example_4_3.png" class="r-stretch"></section>
+<section id="data-imputation" class="slide level2">
+<h2>4.4.1 Data imputation</h2>
+<!-- ![](images/Figure_4_6_imputation_techniques.png){.absolute top="100" left="30" width="800"} -->
+<div class="columns">
+<div class="column" style="width:50%;">
+<div id="fig-anonymous-3943830" class="quarto-figure quarto-figure-center">
+<figure>
+<p><a href="https://probml.github.io/pml-book/book1.html"><img data-src="images/Figure_4_6_imputation_techniques.png"></a></p>
+</figure>
+</div>
+</div><div class="column" style="width:50%;">
+<ul>
+<li><code>df.dropna()</code></li>
+<li><code>df.fillna(df.mean())</code> if number</li>
+<li><code>df.fillna(df.mode())</code> if categorical</li>
+<li><a href="https://www.youtube.com/watch?v=nJ3XefApED0">Partial Missing Multivariate Observation and What to Do With Them by Junpeng Lao</a></li>
+</ul>
+</div>
+</div>
+</section>
+<section id="expectation-maximization-impyute" class="slide level2">
+<h2>4.4.2 Expectation-Maximization <a href="https://github.com/eltonlaw/impyute">impyute</a></h2>
+<div class="sourceCode" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1"></a>nan_xy <span class="op">=</span> matrix.nan_indices(data)</span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="cf">for</span> x_i, y_i <span class="kw">in</span> nan_xy:</span>
+<span id="cb14-3"><a href="#cb14-3"></a>    previous <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb14-4"><a href="#cb14-4"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>):</span>
+<span id="cb14-5"><a href="#cb14-5"></a>        col <span class="op">=</span> data[:, y_i]</span>
+<span id="cb14-6"><a href="#cb14-6"></a>        <span class="co"># Expectation</span></span>
+<span id="cb14-7"><a href="#cb14-7"></a>        mu <span class="op">=</span>  np.nanmean(col)</span>
+<span id="cb14-8"><a href="#cb14-8"></a>        std <span class="op">=</span> np.nanstd(col)</span>
+<span id="cb14-9"><a href="#cb14-9"></a>        <span class="co"># Maximization</span></span>
+<span id="cb14-10"><a href="#cb14-10"></a>        value_to_impute_with <span class="op">=</span> np.random.normal(loc<span class="op">=</span>mu, scale<span class="op">=</span>std)</span>
+<span id="cb14-11"><a href="#cb14-11"></a>        data[x_i][y_i] <span class="op">=</span> value_to_impute_with</span>
+<span id="cb14-12"><a href="#cb14-12"></a>        <span class="co"># Break out of loop if likelihood doesn't change at least 10%</span></span>
+<span id="cb14-13"><a href="#cb14-13"></a>        delta <span class="op">=</span> np.<span class="bu">abs</span>(value_to_impute<span class="op">-</span>previous)<span class="op">/</span>previous</span>
+<span id="cb14-14"><a href="#cb14-14"></a>        <span class="cf">if</span> i <span class="kw">and</span> delta <span class="op">&lt;</span> eps:</span>
+<span id="cb14-15"><a href="#cb14-15"></a>            <span class="cf">break</span></span>
+<span id="cb14-16"><a href="#cb14-16"></a>        previous <span class="op">=</span> value_to_impute_with</span>
+<span id="cb14-17"><a href="#cb14-17"></a><span class="cf">return</span> data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="em-results-for-age-in-titanic" class="slide level2">
+<h2>EM results for Age in Titanic</h2>
+<p><a href="https://www.kaggle.com/cast42/impute-age-with-expectation-maximisation">EM applied on Titanic</a></p>
+<table>
+<caption>AUC with HistGradientBoosting</caption>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th style="text-align: right;">AUC</th>
+<th style="text-align: right;">Std Dev</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Leave Nan</td>
+<td style="text-align: right;">0.8324065257411288</td>
+<td style="text-align: right;">+/- 0.03</td>
+</tr>
+<tr class="even">
+<td>Impute Median</td>
+<td style="text-align: right;">0.8357773122579826</td>
+<td style="text-align: right;">+/- 0.02</td>
+</tr>
+<tr class="odd">
+<td>E.M. Norm</td>
+<td style="text-align: right;">0.8200723671681585</td>
+<td style="text-align: right;">+/- 0.04</td>
+</tr>
+<tr class="even">
+<td>E.M. Fisk</td>
+<td style="text-align: right;">0.8211705706849489</td>
+<td style="text-align: right;">+/- 0.01</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="conclusions" class="slide level2">
+<h2>Conclusions</h2>
+<ul>
+<li>Parameter learning via MLE vs MAP</li>
+<li>Beta and Dirichlet distribution</li>
+<li>Kernel Density: non-paramteric learning</li>
+<li>Expectation Maximization for imputation</li>
+</ul>
+
+<div class="footer footer-default">
+<p><a href="https://dataroots.io" class="uri">https://dataroots.io</a></p>
+</div>
+<img src="images/dr_logo.png" class="slide-logo r-stretch"></section>
+    </div>
+  </div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="parameter_learning_files/libs/revealjs/dist/reveal.js"></script>
+
+  <!-- reveal.js plugins -->
+  <script src="parameter_learning_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="parameter_learning_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="parameter_learning_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="parameter_learning_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="parameter_learning_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="parameter_learning_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  <script src="parameter_learning_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="parameter_learning_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="parameter_learning_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="parameter_learning_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': true,
+'smaller': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":false},
+'smaller': false,
+
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script type="application/javascript">
+    window.document.addEventListener("DOMContentLoaded", function (event) {
+      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+      tabsets.forEach(function(tabset) {
+        const tabby = new Tabby('#' + tabset.id);
+      });
+      const clipboard = new window.ClipboardJS('.code-copy-button', {
+        target: function(trigger) {
+          return trigger.previousElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        // button target
+        const button = e.trigger;
+        // don't keep focus
+        button.blur();
+        // flash "checked"
+        button.classList.add('code-copy-button-checked');
+        setTimeout(function() {
+          button.classList.remove('code-copy-button-checked');
+        }, 1000);
+        // clear code selection
+        e.clearSelection();
+      });
+      function tippyHover(el, contentFn) {
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          maxWidth: 500,
+          delay: 100,
+          arrow: false,
+          appendTo: function(el) {
+              return el.closest('section.slide') || el.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'quarto-reveal',
+          placement: 'bottom-start'
+        };
+          config['offset'] = [0,0];
+          config['maxWidth'] = 700;
+        window.tippy(el, config); 
+      }
+      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+      for (var i=0; i<noterefs.length; i++) {
+        const ref = noterefs[i];
+        tippyHover(ref, function() {
+          let href = ref.getAttribute('href');
+          try { href = new URL(href).hash; } catch {}
+          const id = href.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          return note.innerHTML;
+        });
+      }
+      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+      for (var i=0; i<bibliorefs.length; i++) {
+        const ref = bibliorefs[i];
+        const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+        tippyHover(ref, function() {
+          var popup = window.document.createElement('div');
+          cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    });
+    </script>
+    
+
+</body></html>

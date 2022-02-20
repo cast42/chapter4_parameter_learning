@@ -1,0 +1,598 @@
+---
+title: "Chapter 4: Parameter learning"
+subtitle: "Lode Nachtergaele"
+format:
+  revealjs: 
+    slide-number: true
+    chalkboard: 
+      buttons: false
+    preview-links: auto
+    logo: images/dr_logo.png
+    css: styles.css
+    footer: <https://dataroots.io>
+    code-background: true
+    highlight-style: github
+resources:
+  - demo.pdf
+---
+## Parameter Learning TOC
+
+- 4.1 Maximum Likelihood Parameter Learning
+- 4.2 Bayesian Parameter Learning
+- 4.3 Nonparametric Learning
+- 4.4 Learning with Missing Data
+- 4.5 Summary
+- 4.6 Excercises
+
+## Bayesian network
+
+```
+                                                   S │ P(S)
+   B │ P(B)   ┌─────────┐                ┌─────┐  ───┼─────
+  ───┼─────   │ Battery ├───┐    ┌───────┤Solar│   0 │ 0.98
+   0 │ 0.99   └─────────┘   │    │       └─────┘   1 │ 0.02
+   1 │ 0.01                 │    │
+                            │    │             E B S │ P(E|B,S)
+                            │    │            ───────┼─────────
+                            │    │             0 0 0 │    0.95
+                       ┌────▼────▼────┐        0 0 1 │    0.04
+                       │   Electrical │        0 1 0 │    0.06
+                   ┌───┤System Failure├─┐      0 1 1 │    0.01
+                   │   └──────────────┘ │      1 0 0 │    0.10
+                   │                    │      1 0 1 │    0.96
+                   │                    │      1 1 0 │    0.96
+                   │                    │      1 1 1 │    0.99
+              ┌────▼─────────┐     ┌────▼─────┐
+ C E │P(C|E)  │Communication │     │Trajectory│  D E │P(D|E)
+─────┼──────  │    Loss      │     │ Deviation│ ─────┼──────
+ 0 0 │ 0.98   └──────────────┘     └──────────┘  0 0 │ 0.96
+ 0 1 │ 0.01                                      0 1 │ 0.03
+ 1 0 │ 0.02                                      1 0 │ 0.04
+ 1 1 │ 0.99                                      1 1 │ 0.97
+```
+<!-- ## 4.2.3 Bayesian learning for bayesian networks
+
+![](images/sattelite_example.png)
+
+## 4.2.3 Bayesian networks in Julia
+
+![](images/example_2_5_satellite_G_in_julia.png) -->
+
+## 4.2.3 Bayesian learning for bayesian networks
+```{.julia}
+# Example 2.5
+B = Variable(:b, 2); S = Variable(:s, 2)
+E = Variable(:e, 2)
+D = Variable(:d, 2); C = Variable(:c, 2)
+vars = [B, S, E, D, C]
+factors = [
+  Factor([B], FactorTable((b=1,) => 0.99, (b=2,) => 0.01)),
+  Factor([S], FactorTable((s=1,) => 0.98, (s=2,) => 0.02)),
+  Factor([E,B,S], FactorTable(
+    (e=1,b=1,s=1) => 0.90, (e=1,b=1,s=2) => 0.04,
+    (e=1,b=2,s=1) => 0.05, (e=1,b=2,s=2) => 0.01,
+    (e=2,b=1,s=1) => 0.10, (e=2,b=1,s=2) => 0.96, 
+    (e=2,b=2,s=1) => 0.95, (e=2,b=2,s=2) => 0.99)),
+  Factor([D, E], FactorTable(
+    (d=1,e=1) => 0.96, (d=1,e=2) => 0.03,
+    (d=2,e=1) => 0.04, (d=2,e=2) => 0.97)),
+  Factor([C, E], FactorTable(
+    (c=1,e=1) => 0.98, (c=1,e=2) => 0.01, (c=2,e=1) => 0.02, (c=2,e=2) => 0.99))
+]
+graph = SimpleDiGraph(5)
+add_edge!(graph, 1, 3); add_edge!(graph, 2, 3)
+add_edge!(graph, 3, 4); add_edge!(graph, 3, 5) 
+bn = BayesianNetwork(vars, factors, graph)
+```
+
+## Probabilistic Machine learning
+
+:::: {.columns}
+
+::: {.column width="40%"}
+[![](images/probalistic_machine_learning.png)](https://probml.github.io/pml-book/book1.html)
+:::
+
+::: {.column width="60%"}
+:::
+
+::::
+
+## 4.1 Maximum Likehood Parameter Learning
+
+$$
+\hat\theta = \underset{\theta}{\mathrm{arg \;  max}} \; P(D \mid \theta)
+$$
+
+where:
+
+- $\theta$ represents the parameters of a distribution
+- $P(D \mid \theta)$ is the likelihood that the probability model assigns to data D when model parameters are set to $\theta$
+- $\hat\theta$ is the estimate of the parameter hence the hat
+
+## Two challenges to calculate arg max
+
+1. Choosing appropriate model by which we define $P(D \mid \theta)$
+   + Assume samples of data D are *independently and identically distributed*
+   + $P(D \mid \theta) = \underset{i}{\prod} P(o_{i} \mid \theta)$
+2. Performing maximisation
+   + For common probability models: analytically, others  difficult. But log function is monotonically increasing
+   + $\hat\theta = \underset{\theta}{\mathrm{arg \;  max}} \; \sum_{i} \log P(o_{i} \mid \theta)$
+
+## 4.1.1 Maximum likelihood estimates for categorical distribution
+
+$$P(D \mid \theta) = \theta^{n}(1 - \theta)^{m-n}$$
+
+Log likelihood:
+$$
+\begin{align}
+l(\theta) & = \log (\theta^{n}(1 - \theta)^{m-n}) \\
+          & = n \log \theta + (m-n) \log(1-\theta) \\
+\end{align}
+$$
+
+## Maximum Log likelihood
+
+$$
+     l(\theta)  = n \log \theta + (m-n) \log(1-\theta) 
+$$
+Set first derivative of $l$ to zero:
+$$
+\frac{\partial}{\partial \theta} l(\theta) = \frac{n}{\theta} - \frac{m-n}{1-\theta}
+$$
+Solving for $\hat\theta$ by setting the derivative to zero:
+$$
+\frac{n}{\hat\theta} - \frac{m-n}{1-\hat\theta}  = 0 \implies \hat\theta = \frac{n}{m}
+$$
+
+## 4.1.1 Maximum likelihood for variable X with k values
+
+Maximum likelihood estimate $P(x^{i} \mid n_{1:k})$ is given by
+$$
+\begin{align}
+\hat\theta_{i} & = \frac{n_i}{\sum_{j=1}^{k} n_{j}} \\
+\end{align}
+$$
+
+## Maximum likelihood gender after 3 muffins
+Guppi matched you with 1 non-binary, 1 female and 2 males. Most likely gender next muffin session:
+$$
+\begin{align}
+\hat\theta_{nb} &= \frac{1}{1+1+2}  = 1/4\\
+\hat\theta_{f} &= \frac{1}{1+1+2} = 1/4 \\
+\hat\theta_{m} &= \frac{2}{1+1+2} = 2/4 \\
+\end{align}
+$$
+
+## 4.1.2 MLE for Gaussian distributions
+Gaussian probability density at x:
+$$
+\mathcal{N}(x \mid \mu, \sigma^{2}) = \frac{1}{\sigma}\phi \left( \frac{x-\mu}{\sigma} \right)
+$$
+with $\phi$ is the standard normal density function:
+$$
+\phi(x) = \frac{1}{\sqrt{2\pi}} \exp \left( -\frac{x^{2}}{2} \right)
+$$
+
+## Log likelihood Gaussian
+$$
+l(\mu, \sigma^{2}) \propto -m \log \sigma - \frac{\sum_{i=1}^{m} (o_{i}-\mu)^{2}}{2\sigma^{2}}
+$$
+
+$$
+\begin{align}
+\frac{\partial}{\partial \mu} l(\mu, \sigma^{2}) & = \frac{\sum_{i}(o_{i}-\hat\mu)}{\hat\sigma^{2}} = 0 \\
+ & = -\frac{m}{\hat\sigma} + \frac{\sum_{i}(o_{i}-\hat\mu)^{2}}{\hat\sigma^{3}} \\
+\end{align}
+$$
+
+## 4.1.2 MLE for Gaussian distributions
+$$
+\hat\mu = \frac{\sum_{i}o_{i}}{m} \; \hat\sigma = \frac{\sum_{i} (o_{i}-\hat\mu)^{2}}{m}
+$$
+
+## 4.1.3 MLE for Bayesian networks
+$$
+\hat\theta_{ijk} = \frac{m_{ijk}}{\sum{k^{j}}m_{ijk}}
+$$
+
+## MLE fail with small data
+
+You had 2 muffin session with a man. What is the MLE for next muffin session ?
+
+$$ \hat\theta = \frac{2}{2} = 1 $$
+
+Help! Bayes to the rescue.
+
+## Bayes
+
+$$
+\underbrace{P(\theta \mid D)}_\text{posterior} = \frac{\overbrace{p(D \mid \theta)}^\text{likelihood} \overbrace{p(\theta)}^\text{prior}}{\underbrace{p(D)}_\text{marginal likelihood}}
+$$
+
+## Lagrange: Rule of succession
+
+Probability of succes after having s successes in n trials:
+
+- Each $X_{i}$ has the same chance $p$ of being 1.
+- That chance is independent.
+- The prior distribution over $p$ is uniform: $f(p)=1$ for $0 \leq p \leq 1$
+$$
+P(X_{n+1}=1 \mid S_{n=k})= \frac{k+1}{n+2}.
+$$
+Probability for a man next muffin = 2+1/2+2 = 3/4 = 75%
+[https://jonathanweisberg.org/post/inductive-logic-2/](https://jonathanweisberg.org/post/inductive-logic-2/)
+
+## Law of unconsious statistician
+LOTUS: to calculate the expected value of a function $g(X)$ of a random variable $X$ 
+
+- when one knows the probability distribution of $X$
+- but one does not know the distribution of $g(X)$. 
+
+If prob dist $X$ is discrete and one knows its PMF $P(X=x)$ (but not $P(X=g(x))$),
+then the expected value of $g(X)$ is:
+$$
+\operatorname {E}[g(X)]=\sum_{x}g(x)P(X=x),\,
+$$
+where the sum is over all possible values x of X.
+
+## Law of unconsious statistician
+If it is a continuous distribution and one knows its PDF $P(X=x)$ (but not $P(X=g(x))$), 
+then the expected value of $g(X)$ is
+$$
+{\displaystyle \operatorname {E} [g(X)]=\int _{-\infty }^{\infty }g(x)P(X=x)\,\mathrm {d} x}
+$$
+
+- [Law of the unconscious statistician](https://en.wikipedia.org/wiki/Law_of_the_unconscious_statistician)
+- [Harvard Statistics 101](https://projects.iq.harvard.edu/stat110/home)
+- [Lecture 14: Location, Scale, and LOTUS | Statistics 110](https://youtu.be/9vp1Ll2NpRw?t=2556)
+
+## 4.2 Bayesian Parameter Learning
+Instead of point estimate we obtain distribution:
+$$
+\hat\theta = \operatorname {E}_{\theta \sim p(\cdot \mid D)}[\theta] = \int \theta p(\theta \mid D) d\theta
+$$
+Maximum a posteriori parameter:
+$$
+\hat\theta = \underset{\theta}{\mathrm{arg \;  max}} \; P(\theta \mid D )
+$$
+Do not confuse with MLE: $\hat\theta = \underset{\theta}{\mathrm{arg \;  max}} \; P(D \mid \theta)$
+
+<!-- ## 4.2 MLE vs MAP
+Key idea: treat parameter $\theta$ as random variable (vector) $\Theta$ with a PDF $f_{\Theta}(\theta)$. -->
+
+
+## 4.2.1. Bayes learning for binary dist
+$$
+\begin{align}
+p(\theta \mid o_{1:m}) & \propto p(\theta, o_{1:m}) \\
+ & = p(\theta) \prod_{i=1}^{m} P(o_{i} \mid \theta) \\
+ & = \prod_{i=1}^{m} P(o_{i} \mid \theta) \\
+ & = \prod_{i=1}^{m} \theta^{o_{i}} ( 1-\theta)^{1-o_{i}} \\
+ & = \theta^{n} (1-\theta)^{m-n} \\
+\end{align}
+$$
+
+## 4.2.1 Normalization constant
+
+$$
+\int_{0}^{1} \theta^{n}(1-\theta)^{m-n}d\theta = \frac{\Gamma(n+1)\Gamma(m-n+1)}{\Gamma(m+2)}
+$$
+where $\Gamma$ is the gamma function. Hence MAP bin dist:
+
+$$
+\begin{align}
+p(\theta \mid o_{1:m}) & = \frac{\Gamma(m+2)}{\Gamma(n+1)\Gamma(m-n+1)}\theta^{n} (1-\theta)^{m-n} \\
+ & = Beta(\theta \mid n+1, m-n +1) \\
+\end{align}
+$$
+
+## Example Beta distribution
+
+<!-- https://bayesiancomputationbook.com/notebooks/chp_01.html -->
+
+```{python}
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import stats
+
+np.random.seed(521)
+viridish = [(0.2823529411764706, 0.11372549019607843, 0.43529411764705883, 1.0),
+            (0.1450980392156863, 0.6705882352941176, 0.5098039215686274, 1.0),
+            (0.6901960784313725, 0.8666666666666667, 0.1843137254901961, 1.0)]
+
+_, axes = plt.subplots(2,3, figsize=(12, 6), sharey=True, sharex=True,
+                     constrained_layout=True)
+axes = np.ravel(axes)
+
+n_trials = [0, 1, 2, 3, 12, 180]
+success = [0, 1, 1, 1, 6, 59]
+data = zip(n_trials, success)
+
+beta_params = [(0.5, 0.5), (1, 1), (10, 10)]
+θ = np.linspace(0, 1, 1500)
+for idx, (N, y) in enumerate(data):
+    s_n = ('s' if (N > 1) else '')
+    for jdx, (a_prior, b_prior) in enumerate(beta_params):
+        p_theta_given_y = stats.beta.pdf(θ, a_prior + y, b_prior + N - y)
+
+        axes[idx].plot(θ, p_theta_given_y, lw=4, color=viridish[jdx])
+        axes[idx].set_yticks([])
+        axes[idx].set_ylim(0, 12)
+        axes[idx].plot(np.divide(y, N), 0, color='k', marker='o', ms=12)
+        axes[idx].set_title(f'{N:4d} trial{s_n} {y:4d} success')
+```
+
+## 4.2.2 Bayesian learning for categorical distributions
+Suppose $X$ is a discrete random variable that can take integer values from 1 to $n$.
+We define the parameters of the distribution to be $\theta_{1:n}$ where $P(x^{i}) = \theta_{i}$. Dirichlet distribution can represent both
+prior and posterior distribution and is parameterised by $\alpha_{1:n}$. The densitity
+of the Dirichlet distribution:
+$$
+Dir(\theta_{1:n} \mid \alpha_{1:n}) = \frac{\Gamma(\alpha_0)}{\prod_{i=1}^{n} \Gamma(\alpha_{i})} \prod_{i=1}^{n} \theta_{i}^{\alpha_{i}-1}
+$$
+
+## 4.2.2 Dirichlet distribution
+Common to use uniform prior: $\alpha_{1:n} = 1$. If the prior over $\theta_{1:n}$ is given by $Dir(\alpha_{1:n})$ and there are
+$m_{i}$ observations of $X = 1$ then the posterior is given by:
+$$
+p(\theta_{1:n} \mid \alpha_{1:n}, m_{1:n}) = Dir(\theta_{1:n} \mid \alpha_{1} + m_{1}, \cdots, \alpha_{n} + m_{n})
+$$
+The distribution $Dir(\alpha_{1:n})$ has a mean vector whose $i$th component is
+$$
+\frac{\alpha_{i}}{\sum_{j=1}^{n} \alpha_{j}}
+$$
+
+## 4.2.3 Bayesian learning for bayesian networks
+We can apply Bayesian parameter learning to discrete Bayesian networks. The prior over the Bayesian network
+parameters $\theta$ can be factorized as follows:
+$$
+P(\theta \mid G) = \prod_{i=1}^{n} \prod_{j=1}^{q_{i}} p(\theta_{ij})
+$$
+where $\theta_{ij} = (\theta_{ij1}, \cdots, \theta_{ijr_{i}})$.
+
+## 4.2.3 Bayesian learning for bayesian networks
+$$
+P(\theta \mid G) = \prod_{i=1}^{n} \prod_{j=1}^{q_{i}} p(\theta_{ij})
+$$
+where $\theta_{ij} = (\theta_{ij1}, \cdots, \theta_{ijr_{i}})$.
+
+```{.julia}
+function prior(vars, G)
+  n = length(vars)
+  r = [vars[i].r for i in 1:n]
+  q = [prod([r[j] for j in inneighbors(G,i)]) for i in 1:n]
+  return [ones(q[i], r[i]) for i in 1:n]
+end
+```
+
+## 4.2.3 Bayesian learning for bayesian networks
+After observing data in the form of $m_{ijk}$ counts the posterior is then:
+$$
+P(\theta_{ij} \mid \alpha_{ij}, m_{ij}) = Dir(\theta_{ij} \mid \alpha_{ij1} + m_{ij1}, \cdots, \alpha_{ijr_{i}} + m_{ijr_{i}})
+$$
+
+## Algorithm 4.1
+```{.julia}
+function sub2ind(siz, x)
+  k = vcat(1, cumprod(siz[1:end-1]))
+  return dot(k, x .- 1) + 1
+end
+
+function statistics(vars, G, D::Matrix{Int})
+  n = size(D, 1)
+  r = [vars[i].r for i in 1:n]
+  q = [prod([r[j] for j in inneighbors(G,i)]) for i in 1:n]
+  M = [zeros(q[i], r[i]) for i in 1:n]
+  for o in eachcol(D)
+    for i in 1:n
+      k = o[i]
+      parents = inneighbors(G,i)
+      j=1
+      if !isempty(parents)
+        j = sub2ind(r[parents], o[parents])
+      end
+      M[i][j,k] += 1.0
+    end
+  end
+  return M
+end
+```
+
+## 4.2.3 Example 4.1
+ ```
+  A ────────► B ◄─────── C
+
+         observations
+         ◄────────►
+         1  2  2  1 A
+  D =    1  2  2  1 B
+         2  2  2  2 C
+
+
+  A=1 A=2     B=1 B=2              C=1 C=2
+  ┌─   ─┐    ┌─    ──┐             ┌─   ─┐
+  │2   2│    │ 0   0 │ A=1 & C=1   │0   4│
+  └─   ─┘    │ 0   0 │ A=2 & C=1   └─   ─┘
+             │ 2   0 │ A=1 & C=2
+             │ 0   2 │ A=2 & C=2
+             └──   ──┘
+```
+
+## 4.2.3 Bayesian networks in Julia
+
+![](images/example_4_1.png)
+
+
+## Julia code to calculate prior for G
+
+```{.julia}
+function prior(vars, G)
+  n = length(vars)
+  r = [vars[i].r for i in 1:n]
+  q = [prod([r[j] for j in inneighbors(G,i)]) for i in 1:n]
+  return [ones(q[i], r[i]) for i in 1:n]
+end
+α = prior(vars, G)
+```
+```
+                  n=3
+        ◄───────────────────────────►
+         r[1]=2   r[2]=2       r[3]=2
+        ┌─   ─┐ ┌─    ──┐ ▲   ┌─   ─┐
+ q[1]=1 │1   1│ │ 1   1 │ │   │1   1│  q[3]=1
+        └─   ─┘ │ 1   1 │ │   └─   ─┘
+                │ 1   1 │ │
+                │ 1   1 │ │q[2]=4
+                └──   ──┘ ▼
+```
+
+
+## 4.2.3 Calculating posterior parameters for graph
+
+<!-- ![](images/example_4_2.png) -->
+```
+          ┌─   ─┐ ┌─    ──┐ ┌─   ─┐
+   Prior: │1   1│ │ 1   1 │ │1   1│
+          └─   ─┘ │ 1   1 │ └─   ─┘
+                  │ 1   1 │
+                  │ 1   1 │
+                  └──   ──┘
+          ┌─   ─┐ ┌─    ──┐ ┌─   ─┐
+  Counts: │2   2│ │ 0   0 │ │0   4│
+          └─   ─┘ │ 0   0 │ └─   ─┘
+                  │ 2   0 │
+                  │ 0   2 │
+                  └──   ──┘
+          ┌─   ─┐ ┌─    ──┐ ┌─   ─┐
+Posterior:│3   3│ │ 1   1 │ │1   5│
+          └─   ─┘ │ 1   1 │ └─   ─┘
+                  │ 3   1 │
+                  │ 1   3 │
+                  └──   ──┘
+```
+## 4.2.3 Normalization of the posterior
+```
+          ┌─   ─┐ ┌─    ──┐ ┌─   ─┐
+Posterior:│3   3│ │ 1   1 │ │1   5│
+          └─   ─┘ │ 1   1 │ └─   ─┘
+                  │ 3   1 │
+                  │ 1   3 │
+                  └──   ──┘
+```
+
+```{.julia}
+θ = [mapslices(x->normalize(x,1), Mi, dims=2) for Mi in M + α]
+```
+```
+ ┌─     ─┐ ┌─      ──┐ ┌─     ─┐
+ │0.5 0.5│ │0.5  0.5 │ │1/6 5/6│
+ └─     ─┘ │0.5  0.5 │ └─     ─┘
+           │0.75 0.25│
+           │0.25 0.75│
+           └──     ──┘
+```
+
+## 4.2.3 Exercise 4.4
+```
+         ┌────┐             ┌──                 ──┐
+ X1:     │ X1 │             │ 1 2 1 1 1 2 1 2 1 1 │
+ [1,2]   └─┬──┘             │ 2 2 2 1 2 1 1 1 2 1 │
+           │              D=│ 2 2 2 1 1 1 1 1 2 1 │
+         ┌─▼──┐    ┌────┐   │ 3 2 2 1 1 3 3 1 1 1 │
+ X4:     │ X4 │    │ X3 │   └──                 ──┘
+[1,2,3]  └─┬──┘    └─┬──┘
+           │         │   X3: [1,2]
+ X2:       │  ┌────┐ │
+[1,2]      └──► X2 ◄─┘
+              └────┘
+                  ┌─ ─┐
+     ┌─  ─┐       │3 1│    ┌─  ─┐    ┌─    ─┐
+  M1=│7 3 │  M2=  │0 0│ M3=│6 4 │ M4=│5 0 2 │
+     └─  ─┘       │2 0│    └─  ─┘    │1 1 1 │
+                  │0 2│              └─    ─┘
+                  │0 1│
+                  │0 1│
+                  └─ ─┘
+```
+
+## 4.3 Nonparametric learning
+
+```{.julia}
+# Algorithm 4.3
+
+gaussian_kernel(b) = x->pdf(Normal(0,b), x)
+
+function kernel_density_estimate(φ, O)
+  return x -> sum([φ(x - o) for o in O])/length(O)
+end
+```
+[Jake VanderPlas: In depth: Kernel density Estimation](https://jakevdp.github.io/PythonDataScienceHandbook/05.13-kernel-density-estimation.html)
+
+## 4.4 Learning with missing data
+
+![](images/example_4_3.png)
+
+## 4.4.1 Data imputation
+
+<!-- ![](images/Figure_4_6_imputation_techniques.png){.absolute top="100" left="30" width="800"} -->
+
+:::: {.columns}
+
+::: {.column width="50%"}
+[![](images/Figure_4_6_imputation_techniques.png)](https://probml.github.io/pml-book/book1.html)
+:::
+
+::: {.column width="50%"}
+
+- ```df.dropna()```
+- ```df.fillna(df.mean())``` if number
+- ```df.fillna(df.mode())``` if categorical
+- [Partial Missing Multivariate Observation and What to Do With Them by Junpeng Lao](https://www.youtube.com/watch?v=nJ3XefApED0)
+
+:::
+
+::::
+
+
+## 4.4.2 Expectation-Maximization [impyute](https://github.com/eltonlaw/impyute)
+
+```{.python}
+nan_xy = matrix.nan_indices(data)
+for x_i, y_i in nan_xy:
+    previous = 1
+    for i in range(5):
+        col = data[:, y_i]
+        # Expectation
+        mu =  np.nanmean(col)
+        std = np.nanstd(col)
+        # Maximization
+        value_to_impute_with = np.random.normal(loc=mu, scale=std)
+        data[x_i][y_i] = value_to_impute_with
+        # Break out of loop if likelihood doesn't change at least 10%
+        delta = np.abs(value_to_impute-previous)/previous
+        if i and delta < eps:
+            break
+        previous = value_to_impute_with
+return data
+```
+
+## EM results for Age in Titanic
+
+[EM applied on Titanic](https://www.kaggle.com/cast42/impute-age-with-expectation-maximisation)
+
+| Method        |                 AUC| Std Dev | 
+|---------------|-------------------:|--------:|
+| Leave Nan     | 0.8324065257411288 | +/- 0.03|
+| Impute Median | 0.8357773122579826 | +/- 0.02|
+| E.M. Norm     | 0.8200723671681585 | +/- 0.04|
+| E.M. Fisk     | 0.8211705706849489 | +/- 0.01|
+
+: AUC with HistGradientBoosting
+
+## Conclusions
+
+- Parameter learning via MLE vs MAP
+- Beta and Dirichlet distribution
+- Kernel Density: non-parameteric learning
+- Imputation: 4 strategies and Expectation Maximization 
