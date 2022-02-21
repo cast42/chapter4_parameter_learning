@@ -4,4 +4,6 @@ by Mykel Kochenderfer, Tim Wheeler, and Kyle Wray.
 
 The Julia code of the book can be found in [Parameter_learning.ipynb](Parameter_learning.ipynb).
 
-The application of Expectation Maximisation in [impute-age-with-expectation-maximisation.ipynb](impute-age-with-expectation-maximisation.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://github.com/cast42/chapter4_parameter_learning/blob/main/Parameter_learning.ipynb)
+
+The application of Expectation Maximisation in [impute-age-with-expectation-maximisation.ipynb](impute-age-with-expectation-maximisation.ipynb) or on [Kaggle](https://www.kaggle.com/cast42/impute-age-with-expectation-maximisation).
