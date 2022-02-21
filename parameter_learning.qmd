@@ -17,12 +17,15 @@ resources:
 ---
 ## Parameter Learning TOC
 
-- 4.1 Maximum Likelihood Parameter Learning
-- 4.2 Bayesian Parameter Learning
-- 4.3 Nonparametric Learning
-- 4.4 Learning with Missing Data
-- 4.5 Summary
-- 4.6 Excercises
+- Part 1 Probalistic reasoning
+  - Chapter 3: Inference
+  - Chapter 4: Parameter Learning
+    - 4.1 Maximum Likelihood Parameter Learning
+    - 4.2 Bayesian Parameter Learning
+    - 4.3 Nonparametric Learning
+    - 4.4 Learning with Missing Data
+  - Chapter 5: Structure learning
+
 
 ## Bayesian network
 
