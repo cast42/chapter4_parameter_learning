@@ -4,7 +4,7 @@ by Mykel Kochenderfer, Tim Wheeler, and Kyle Wray.
 
 To view the slides in a browser, clone this repo and open the [html file](parameter_learning.html) in your browser.
 
-[The slides in PDF.](https://github.com/cast42/chapter4_parameter_learning/blob/main/Chapter%204_%20Parameter%20learning.pdff)
+[The slides in PDF.](https://github.com/cast42/chapter4_parameter_learning/blob/main/Chapter%204_%20Parameter%20learning.pdf)
 
 The Julia code needed for chapter 4 of the [book](https://algorithmsbook.com/) can be found in [Parameter_learning.ipynb](Parameter_learning.ipynb).
 
