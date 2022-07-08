@@ -22,7 +22,7 @@ export QUARTO_PYTHON=/Users/lode/opt/anaconda3/envs/quarto/bin/python
 check with ```echo $QUARTO_PYTHON                                              
 /Users/lode/opt/anaconda3/envs/quarto/bin/python```
 
-## Optional is you want to execute R in your docs
+## Optional if you want to execute R in your docs
 
 ( instead ofnstall R: https://cloud.r-project.org/, install R with conda:)
 
